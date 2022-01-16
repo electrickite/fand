@@ -1,0 +1,41 @@
+#!/bin/sh
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2022 Corey Hinshaw <corey@electrickite.org>
+
+# PROVIDE: fand
+# REQUIRE: DAEMON devfs sysctl
+# KEYWORD: nojail shutdown
+
+. /etc/rc.subr
+
+name="fand"
+desc="System fan control"
+rcvar="fand_enable"
+
+load_rc_config $name
+: ${fand_enable:=NO}
+: ${fand_sensor=""}
+: ${fand_device=""}
+: ${fand_temp="50"}
+: ${fand_off_temp="35"}
+: ${fand_period="0"}
+: ${fand_duty="0"}
+: ${fand_kelvin:=NO}
+: ${fand_multiplier="1.0"}
+
+command="PREFIX/sbin/${name}"
+command_args="${fand_sensor} ${fand_device}"
+pidfile="/var/run/${name}.pid"
+
+start_precmd="${name}_setflags"
+
+fand_setflags() {
+    if checkyesno fand_kelvin; then
+        kelvin_flag="-K"
+    else
+        kelvin_flag=""
+    fi
+    rc_flags="-t ${fand_temp} -o ${fand_off_temp} -p ${fand_period} -d ${fand_duty} ${kelvin_flag} -m ${fand_multiplier} ${rc_flags}"
+}
+
+run_rc_command "$1"
