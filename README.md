@@ -17,7 +17,7 @@ Uninstall with:
 
 ## Usage and options
 
-See thea `fand(8)` man page for command usage and options.
+See the `fand(8)` man page for command usage and options.
 
 To determine the correct settings for `-K` (Kelvin) and `-m` (multiplier), it
 can be helpful to compare the output from `sysctl` for the temperature sensor
