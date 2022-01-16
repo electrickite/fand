@@ -1,7 +1,7 @@
 PREFIX = /usr/local
 MANPREFIX = $(PREFIX)/man
 
-RM = rm
+RM = rm -f
 SED = sed
 GZIP = gzip --force
 INSTALL = install

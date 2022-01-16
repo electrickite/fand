@@ -41,7 +41,7 @@
 #include <sys/types.h>
 
 #define PROGNAME "fand"
-#define VERSION "0.1.0"
+#define VERSION "0.1.1"
 #define KELVIN_OFFSET -273.15
 
 static struct pidfh *pfh = NULL;
@@ -229,11 +229,12 @@ int main(int argc, char *argv[])
 	if (high_temp <= low_temp)
 		high_temp_set = false;
 
+	if ((fd = open(pwm_device, O_RDWR)) == -1)
+		err(EXIT_FAILURE, "Cannot open %s", pwm_device);
+	if (ioctl(fd, PWMGETSTATE, &current_state) == -1)
+		err(EXIT_FAILURE, "Cannot read state of the PWM controller");
+
 	if (show_status) {
-		if ((fd = open(pwm_device, O_RDWR)) == -1)
-			err(EXIT_FAILURE, "Cannot open %s", pwm_device);
-		if (ioctl(fd, PWMGETSTATE, &current_state) == -1)
-			err(EXIT_FAILURE, "Cannot read state of the PWM controller");
 		print_status(current_state, current_temperature());
 		exit(EXIT_SUCCESS);
 	}
@@ -249,13 +250,15 @@ int main(int argc, char *argv[])
   			err(EXIT_FAILURE, "Failed to daemonize!");
 		}
 		pidfile_write(pfh);
-	}
+	} else
+		print_status(current_state, current_temperature());
 
 	for(;;) {
 		if ((fd = open(pwm_device, O_RDWR)) == -1)
 			err(EXIT_FAILURE, "Cannot open %s", pwm_device);
-		if (ioctl(fd, PWMGETSTATE, &new_state) == -1)
+		if (ioctl(fd, PWMGETSTATE, &current_state) == -1)
 			err(EXIT_FAILURE, "Cannot read state of the PWM controller");
+		new_state = current_state;
 		temp = current_temperature();
 
 		if (temp >= low_temp)
@@ -284,7 +287,6 @@ int main(int argc, char *argv[])
 				print_status(new_state, temp);
 			}
 		}
-		current_state = new_state;
 
 		close(fd);
 		sleep(interval);
