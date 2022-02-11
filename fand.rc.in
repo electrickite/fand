@@ -1,41 +1,67 @@
 #!/bin/sh
-# SPDX-License-Identifier: BSD-2-Clause
-# Copyright (c) 2022 Corey Hinshaw <corey@electrickite.org>
 
 # PROVIDE: fand
 # REQUIRE: DAEMON devfs sysctl
 # KEYWORD: nojail shutdown
+#
+# Add these lines to /etc/rc.conf.local or /etc/rc.conf
+# to enable this service:
+#
+# fand_enable (bool):     Set to "YES" to enable fand.
+#                         Set to "NO" by default.
+# fand_sensor (str):      sysctl variable used to read temperature
+#                         Required to start fand. Ex: hw.temp.CPU
+# fand_device (str):      The pwmc fan controller device
+#                         Required to start fand. Ex: pwmc1.0
+# fand_temp (str):        Temperature (°C) at which the fan is enabled
+#                         Default is 50
+# fand_off_temp (str):    Temperature (°C) at which the fan is disabled
+#                         Default is 35
+# fand_period (str):      The period in nanoseconds of the PWM channel 
+#                         Default is 0
+# fand_duty (str):        PWM channel duty cycle (nanoseconds or percentage)
+#                         Default is 0
+# fand_kelvin (str):      "YES" if the temperature sensor is in Kelvin 
+#                         Default is "YES"
+# fand_multiplier (str):  A multiplier to apply to the reported temperature
+#                         Default is 1.0
+# fand_flags (str):       Additional command options to pass to fand
+#                         Unset by default
 
 . /etc/rc.subr
 
-name="fand"
+name=fand
 desc="System fan control"
-rcvar="fand_enable"
+rcvar=fand_enable
 
 load_rc_config $name
 : ${fand_enable:=NO}
-: ${fand_sensor=""}
-: ${fand_device=""}
-: ${fand_temp="50"}
-: ${fand_off_temp="35"}
-: ${fand_period="0"}
-: ${fand_duty="0"}
-: ${fand_kelvin:=NO}
-: ${fand_multiplier="1.0"}
+: ${fand_temp=50}
+: ${fand_off_temp=35}
+: ${fand_period=0}
+: ${fand_duty=0}
+: ${fand_kelvin:=YES}
+: ${fand_multiplier=1.0}
 
 command="PREFIX/sbin/${name}"
 command_args="${fand_sensor} ${fand_device}"
 pidfile="/var/run/${name}.pid"
 
-start_precmd="${name}_setflags"
+start_precmd="${name}_prestart"
 
-fand_setflags() {
+fand_prestart()
+{
+    if [ -z "${fand_sensor}" -o -z "${fand_device}"]; then
+        err 1 "fand_sensor and fand_device are required to start fand!"
+    fi
+
     if checkyesno fand_kelvin; then
-        kelvin_flag="-K"
+        kelvin_flag="-K "
     else
         kelvin_flag=""
     fi
-    rc_flags="-t ${fand_temp} -o ${fand_off_temp} -p ${fand_period} -d ${fand_duty} ${kelvin_flag} -m ${fand_multiplier} ${rc_flags}"
+
+    rc_flags="${fand_temp:+-t $fand_temp }${fand_off_temp:+-o $fand_off_temp }${fand_period:+-p $fand_period }${fand_duty:+-d $fand_duty }${kelvin_flag}${fand_multiplier:+-m $fand_multiplier }${rc_flags}"
 }
 
 run_rc_command "$1"

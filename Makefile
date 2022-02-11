@@ -3,21 +3,17 @@ MANPREFIX = $(PREFIX)/man
 
 RM = rm -f
 SED = sed
-GZIP = gzip --force
 INSTALL = install
 
 CFLAGS = -pedantic -Wall -Wextra -Werror -Wno-unused-parameter -Os -s -lutil
 
 TARGET = fand
-MAN = $(TARGET).8.gz
+MAN = $(TARGET).8
 RC = $(TARGET).rc
 
-all: $(TARGET) $(MAN) $(RC)
+all: $(TARGET) $(RC)
 
 $(TARGET): $(TARGET).c
-
-$(MAN): $(MAN:%.gz=%)
-	$(GZIP) -9 --keep $>
 
 $(RC): $(RC).in
 	$(SED) "s|PREFIX|$(PREFIX)|g" < $> > $@
@@ -38,4 +34,4 @@ uninstall:
 	$(RM) $(DESTDIR)$(MANPREFIX)/man8/$(MAN)
 
 clean:
-	$(RM) $(TARGET) $(MAN) $(RC)
+	$(RM) $(TARGET) $(RC)

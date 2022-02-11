@@ -25,22 +25,9 @@ and the temperature reported by using the `fand -s` option.
 
 ## rc.d Service
 
-fand provides an rc.d service. It can be configured using the following
-rc variables:
-
-  * `fand_enable` - Enable/disable the service
-  * `fand_sensor` - The sysctl variable containing the system temperature
-  * `fand_device` - The pwmc fan controller device
-  * `fand_temp` - Temperature (°C) at which the fan is enabled
-  * `fand_off_temp` - Temperature (°C) at which the fan is disabled
-  * `fand_period` - The period in nanoseconds of the PWM channel
-  * `fand_duty` - The PWM channel duty cycle in nanoseconds or percentage)
-  * `fand_kelvin` - The sysctl temperature sensor is in degrees Kelvin
-  * `fand_multiplier` - A multiplier to apply to the reported temperature
-  * `fand_flags` - Additional command options to pass to fand
-
-Note that both `fand_sensor` and `fand_device` are required to start the
-service.
+fand provides an rc.d service. The availablea rc variables are documented in
+the rc script, installed by default at `/usr/local/etc/rc.d/fand`. Note that
+both `fand_sensor` and `fand_device` are required to start the service.
 
 ### rc.d Example
 
