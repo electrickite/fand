@@ -41,7 +41,7 @@
 #include <sys/types.h>
 
 #define PROGNAME "fand"
-#define VERSION "0.2.1"
+#define VERSION "0.2.2"
 #define KELVIN_OFFSET -273.15
 
 static struct pidfh *pfh = NULL;

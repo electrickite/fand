@@ -51,7 +51,7 @@ start_precmd="${name}_prestart"
 
 fand_prestart()
 {
-    if [ -z "${fand_sensor}" -o -z "${fand_device}"]; then
+    if [ -z "${fand_sensor}" -o -z "${fand_device}" ]; then
         err 1 "fand_sensor and fand_device are required to start fand!"
     fi
 
