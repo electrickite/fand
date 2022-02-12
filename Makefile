@@ -5,7 +5,7 @@ RM = rm -f
 SED = sed
 INSTALL = install
 
-CFLAGS = -pedantic -Wall -Wextra -Werror -Wno-unused-parameter -Os -s -lutil
+CFLAGS += -pedantic -Wall -Wextra -Werror -Wno-unused-parameter -lutil
 
 TARGET = fand
 MAN = $(TARGET).8
